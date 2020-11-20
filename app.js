@@ -1,4 +1,4 @@
-const apiUrl = 'https://cors-anywhere.herokuapp.com/https://superheroapi.com/api/10218999215392598';
+const apiUrl = 'https://superheroapi.com/api/10218999215392598';
 const searchInput = document.querySelector('.search-box');
 const searchBtn = document.querySelector('.search-btn');
 const randBtn = document.querySelector('.rand-btn');
