@@ -69,11 +69,17 @@ button:active {
 }
 
 .light-text {
-    color: var(--light-color)
+    color: var(--light-color);
 }
 
 .dark-text {
-    color: var(--dark-color)
+    color: var(--dark-color);
+}
+
+.error-text {
+    color: var(--dark-color);
+    font-size: 25px;
+    text-align: center;
 }
 
 /* Search input and buttons */
@@ -163,7 +169,50 @@ button:active {
     transform: scale(0.95);
 }
 
-/* Media */
+/* Loading spinner */
+
+.loader-enabled {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 100;
+    background-color: rgba(255, 255, 255, 0.6);
+}
+
+.loader {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -50px;
+    margin-left: -50px;
+    width: 80px;
+    height: 80px;
+}
+
+.loader:after {
+    content: " ";
+    display: block;
+    width: 48px;
+    height: 48px;
+    margin: 8px;
+    border-radius: 50%;
+    border: 5px solid var(--dark-color);
+    border-color: var(--dark-color) transparent var(--dark-color) transparent;
+    animation: loader 1.5s linear infinite;
+}
+
+@keyframes loader {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Media queries */
 
 @media(max-width:767px) {
     .heroes {
