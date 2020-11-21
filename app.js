@@ -11,9 +11,6 @@ function enableLoadingAnim() {
 	loader.classList.add('loader');
 	loaderContainer.appendChild(loader);
 	searchInput.disabled = true;
-	searchInput.style.opacity = 0.5;
-	searchBtn.style.opacity = 0.5;
-	randBtn.style.opacity = 0.5;
 	getHero();
 }
 
@@ -22,19 +19,23 @@ function disableLoadingAnim() {
 	const loaderContainer = document.querySelector('.loader-container');
 	console.dir(loader);
 	loaderContainer.classList.remove('loader-enabled');
-	searchInput.style.opacity = 1;
-	searchBtn.style.opacity = 1;
-	randBtn.style.opacity = 1;
 	searchInput.disabled = false;
 	loader.remove();
 	searchInput.value = '';
 }
 
-function noHeroesFoundError() {
-	const errorText = document.createElement('p');
-	errorText.classList.add('error-text');
-	errorText.innerText = `No heroes found with your query (${searchInput.value})`;
-	searchResults.insertAdjacentElement('beforebegin', errorText);
+function noHeroesFoundError(text) {
+	const errorText = document.querySelector('.error-text');
+	if (errorText !== null) errorText.remove();
+	const errorEl = document.createElement('p');
+	errorEl.classList.add('error-text');
+	if (text.includes('error')) {
+		errorEl.innerText = `${text}`;
+	} else {
+		errorEl.innerText = `No heroes found with your query (${text})`;
+	}
+	searchResults.insertAdjacentElement('beforebegin', errorEl);
+	disableLoadingAnim();
 }
 
 async function getHero() {
@@ -47,11 +48,11 @@ async function getHero() {
 			displaySearchResults(data);
 			disableLoadingAnim();
 		} else if ((data.response = 'error')) {
-			noHeroesFoundError();
-			disableLoadingAnim();
+			noHeroesFoundError(searchInput);
 		}
 		return data;
 	} catch (error) {
+		noHeroesFoundError('Server error');
 		console.log('getHero error -> ', error);
 	}
 }
@@ -65,7 +66,7 @@ async function getRandomHero() {
 
 		return data;
 	} catch (error) {
-		console.log('getHero error -> ', error);
+		console.log('getRandomHero error -> ', error);
 	}
 }
 
