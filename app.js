@@ -4,20 +4,21 @@ const searchBtn = document.querySelector('.search-btn');
 const randBtn = document.querySelector('.rand-btn');
 const searchResults = document.querySelector('.heroes');
 
-function enableLoadingAnim() {
+function enableSpinner(e) {
+	const btnDataset = e.target.dataset.type;
 	const loader = document.createElement('div');
 	const loaderContainer = document.querySelector('.loader-container');
 	loaderContainer.classList.add('loader-enabled');
 	loader.classList.add('loader');
 	loaderContainer.appendChild(loader);
 	searchInput.disabled = true;
-	getHero();
+	if (btnDataset === 'random') getRandomHero();
+	else getHero();
 }
 
-function disableLoadingAnim() {
+function disableSpiner() {
 	const loader = document.querySelector('.loader');
 	const loaderContainer = document.querySelector('.loader-container');
-	console.dir(loader);
 	loaderContainer.classList.remove('loader-enabled');
 	searchInput.disabled = false;
 	loader.remove();
@@ -25,28 +26,26 @@ function disableLoadingAnim() {
 }
 
 function noHeroesFoundError(text) {
-	const errorText = document.querySelector('.error-text');
-	if (errorText !== null) errorText.remove();
 	const errorEl = document.createElement('p');
 	errorEl.classList.add('error-text');
-	if (text.includes('error')) {
-		errorEl.innerText = `${text}`;
-	} else {
-		errorEl.innerText = `No heroes found with your query (${text})`;
-	}
+	if (text.includes('error')) errorEl.innerText = `${text}`;
+	else errorEl.innerText = `No heroes found with your query (${text})`;
 	searchResults.insertAdjacentElement('beforebegin', errorEl);
-	disableLoadingAnim();
+	disableSpiner();
+	setTimeout(() => {
+		errorEl.remove();
+	}, 2500);
 }
 
 async function getHero() {
-	const searchInput = document.querySelector('.search-box').value;
 	searchResults.innerHTML = '';
+	const searchInput = document.querySelector('.search-box').value;
 	try {
-		const res = await fetch(`${apiUrl}/search/${searchInput}`);
+		const res = await fetch(`${apiUrl}/search/${searchInput.trim().toLowerCase()}`);
 		const data = await res.json();
 		if (data.response === 'success') {
-			displaySearchResults(data);
-			disableLoadingAnim();
+			data.results.forEach(hero => displayHeroes(hero));
+			disableSpiner();
 		} else if ((data.response = 'error')) {
 			noHeroesFoundError(searchInput);
 		}
@@ -58,35 +57,39 @@ async function getHero() {
 }
 
 async function getRandomHero() {
+	searchResults.innerHTML = '';
 	const randomId = Math.floor(Math.random() * 731);
 	console.log(randomId);
 	try {
 		const res = await fetch(`${apiUrl}/${randomId}`);
 		const data = await res.json();
-
+		if (data.response === 'success') {
+			displayHeroes(data);
+			disableSpiner();
+		} else if ((data.response = 'error')) {
+			noHeroesFoundError(searchInput);
+		}
 		return data;
 	} catch (error) {
 		console.log('getRandomHero error -> ', error);
 	}
 }
 
-function displaySearchResults(data) {
+function displayHeroes(data) {
 	console.log(data);
-	const heroesFoundArray = data.results;
-	console.log(heroesFoundArray);
-	heroesFoundArray.forEach(hero => {
-		console.log(hero.id);
-		const newHeroCard = document.createElement('div');
-		newHeroCard.classList.add('hero-card');
-		newHeroCard.innerHTML = `
-			<img src="${hero.image.url}" alt="${hero.name}">
-		<p>${hero.name}</p>
+	const newHeroCard = document.createElement('div');
+	newHeroCard.classList.add('hero-card');
+	newHeroCard.innerHTML = `
+		<img src="${data.image.url}" alt="${data.name}">
+		<p>${data.name}</p>
 		<button class="light-text">More Details</button>
 		`;
-		searchResults.appendChild(newHeroCard);
-	});
+	searchResults.appendChild(newHeroCard);
 }
 
 // Event listeners
-searchBtn.addEventListener('click', enableLoadingAnim);
-randBtn.addEventListener('click', getRandomHero);
+searchBtn.addEventListener('click', e => (searchInput.value ? enableSpinner(e) : ''));
+randBtn.addEventListener('click', enableSpinner);
+searchInput.addEventListener('keydown', e => {
+	if (e.key === 'Enter' && searchInput.value) enableSpinner(e);
+});
