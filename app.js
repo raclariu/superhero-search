@@ -46,15 +46,32 @@ async function getHero() {
 	searchResults.innerHTML = '';
 	const searchInput = document.querySelector('.search-box').value;
 	try {
-		const res = await fetch(`${apiUrl}/search/${searchInput.trim().toLowerCase()}`);
-		const data = await res.json();
-		if (data.response === 'success') {
-			data.results.forEach(hero => displayHeroes(hero));
-			disableSpiner();
-		} else if ((data.response = 'error')) {
-			noHeroesFoundError(searchInput);
+		let res;
+		let data;
+		if (parseInt(searchInput)) {
+			console.log('test');
+			res = await fetch(`${apiUrl}/${searchInput.trim()}`);
+			data = await res.json();
+			if (data.response === 'success') {
+				displayHeroes(data);
+				disableSpiner();
+			} else if ((data.response = 'error')) {
+				noHeroesFoundError(searchInput);
+			}
+			return data;
 		}
-		return data;
+
+		if (typeof searchInput === 'string') {
+			res = await fetch(`${apiUrl}/search/${searchInput.trim().toLowerCase()}`);
+			data = await res.json();
+			if (data.response === 'success') {
+				data.results.forEach(hero => displayHeroes(hero));
+				disableSpiner();
+			} else if ((data.response = 'error')) {
+				noHeroesFoundError(searchInput);
+			}
+			return data;
+		}
 	} catch (error) {
 		noHeroesFoundError('Server error');
 		console.log('getHero error -> ', error);

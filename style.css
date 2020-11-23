@@ -284,6 +284,7 @@ button:active {
     text-align: center;
     font-size: 20px;
     width: 75%;
+    margin-top: -2px;
     background-color: var(--dark-color);
     border: 2px solid var(--dark-color);
     border-top: none;
